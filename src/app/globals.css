@@ -37,6 +37,8 @@ a { color: inherit; text-decoration: none; }
 .result-header h3 { margin: .5rem 0 0; }
 .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1rem; }
 .result-grid strong { display: block; margin-bottom: .35rem; }
+.psid-registration { display: grid; gap: 1rem; margin-top: 1rem; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: .9rem; }
 .status-chip { display: inline-flex; align-items: center; padding: .45rem .7rem; border-radius: 999px; border: 1px solid var(--border); background: rgba(255,255,255,.05); text-transform: capitalize; }
 .status-chip.clear, .status-chip.ok, .status-chip.active { color: #9be29f; }
 .status-chip.flagged, .status-chip.listed, .status-chip.stolen { color: #ffd58d; }
