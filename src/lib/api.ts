@@ -26,7 +26,7 @@ export async function safeGet<T>(path: string): Promise<T> {
   return parsed?.data || parsed as T;
 }
 
-// Helper for POST requests with proper error handling
+// Helper for POST requests
 export async function safePost<T>(path: string, body: unknown): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, {
     method: "POST",
@@ -48,4 +48,26 @@ export async function safePost<T>(path: string, body: unknown): Promise<T> {
   }
 
   return parsed.data as T;
+}
+
+// Helper for file uploads (FormData)
+export async function safeUpload<T>(path: string, formData: FormData): Promise<T> {
+  const response = await fetch(`${API_BASE}${path}`, {
+    method: "POST",
+    body: formData,
+  });
+
+  const text = await response.text();
+  let parsed: any = null;
+  try {
+    parsed = text ? JSON.parse(text) : null;
+  } catch {
+    throw new Error(text || "Unexpected response from server");
+  }
+
+  if (!response.ok) {
+    throw new Error(parsed?.message || "Upload failed");
+  }
+
+  return parsed.data || parsed as T;
 }
