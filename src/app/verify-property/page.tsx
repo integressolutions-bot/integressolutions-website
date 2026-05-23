@@ -1,4 +1,4 @@
-"use client";
+ "use client";
 
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
@@ -18,7 +18,7 @@ interface PropertyData {
   status: "verified" | "flagged" | "stolen" | "pending";
   registrationDate: string;
   verificationCount: number;
-  lawEnforcementContact?: string;
+  lawEnforcementContact?: string;   // Will be country-specific later (global model)
   caseNumber?: string;
 }
 
@@ -172,10 +172,18 @@ function VerifyContent() {
               </div>
             </div>
 
+            {/* Law enforcement case – temporary Integres contact, will become country-specific later */}
             {property.status === "stolen" && property.caseNumber && (
               <div className="bg-red-50 border border-red-200 rounded p-3">
-                <p className="text-sm font-semibold text-red-800">🚨 Law Enforcement Case #{property.caseNumber}</p>
-                <p className="text-xs text-red-600 mt-1">Contact: {property.law EnforcementContact || "Your local police station"}</p>
+                <p className="text-sm font-semibold text-red-800">
+                  🚨 Law Enforcement Case #{property.caseNumber}
+                </p>
+                <p className="text-xs text-red-600 mt-1">
+                  Contact: {property.lawEnforcementContact || "Integres Support: support@integressolutions.com | +234 802 104 9037"}
+                </p>
+                <p className="text-xs text-gray-500 mt-1 italic">
+                  Note: Law enforcement contacts are being onboarded per country. For now, report to Integres.
+                </p>
               </div>
             )}
 
@@ -185,7 +193,7 @@ function VerifyContent() {
             </div>
           </div>
 
-          {/* Action Buttons - CORRECTED: No practitioner button */}
+          {/* Action Buttons */}
           <div className="bg-gray-50 p-4 flex gap-3 border-t">
             {(property.status === "stolen" || property.status === "flagged") && (
               <button
