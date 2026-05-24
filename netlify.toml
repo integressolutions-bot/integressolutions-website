@@ -1,45 +1,38 @@
-[build]
-command = "npm run build"
-publish = ".next"
+ [build]
+  command = "npm run build"
+  publish = ".next"
 
+# 1. PSID routes (frontend /api/psid/* -> backend /api/mobile/psid/*)
+[[redirects]]
+  from = "/api/psid/*"
+  to = "https://integres-backend-production.up.railway.app/api/mobile/psid/:splat"
+  status = 200
+  force = true
+
+# 2. Blacklist routes (frontend /api/blacklist/* -> backend /api/mobile/blacklist/*)
+[[redirects]]
+  from = "/api/blacklist/*"
+  to = "https://integres-backend-production.up.railway.app/api/mobile/blacklist/:splat"
+  status = 200
+  force = true
+
+# 3. Practitioner routes (frontend /api/practitioner/* -> backend /api/practitioner/*)
+[[redirects]]
+  from = "/api/practitioner/*"
+  to = "https://integres-backend-production.up.railway.app/api/practitioner/:splat"
+  status = 200
+  force = true
+
+# 4. General fallback for other /api/* (auth, admin, etc.)
+[[redirects]]
+  from = "/api/*"
+  to = "https://integres-backend-production.up.railway.app/api/:splat"
+  status = 200
+  force = true
+
+# 5. Security headers (optional)
 [[headers]]
-for = "/_next/static/*"
+  for = "/*"
   [headers.values]
-  Cache-Control = "public, max-age=31536000, immutable"
-
-[[redirects]]
-from = "/api/*"
-to = "https://integres-backend-production.up.railway.app/api/:splat"
-status = 200
-force = true
-
-[[redirects]]
-from = "/_next/image"
-to = "/.netlify/images?url=:url&w=:width&q=:quality"
-status = 200
-  [redirects.query]
-  url = ":url"
-  w = ":width"
-  q = ":quality"
-
-[[redirects]]
-from = "/_ipx/*"
-to = "/.netlify/images?url=:url&w=:width&q=:quality"
-status = 200
-  [redirects.query]
-  url = ":url"
-  w = ":width"
-  q = ":quality"
-
-[context]
-  [context.production]
-    [[context.production.headers]]
-    for = "/_next/static/*"
-      [context.production.headers.values]
-      Cache-Control = "public, max-age=31536000, immutable"
-
-  [context.main]
-    [[context.main.headers]]
-    for = "/_next/static/*"
-      [context.main.headers.values]
-      Cache-Control = "public, max-age=31536000, immutable"
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
