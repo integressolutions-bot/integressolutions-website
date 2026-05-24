@@ -3,6 +3,14 @@
 import { useEffect, useState } from 'react';
 import { safeGet, safePost } from '@/lib/api';
 
+interface Dispute {
+  _id: string;
+  recordName: string;
+  reason: string;
+  status: 'pending' | 'in_review' | 'resolved' | 'rejected';
+  createdAt: string;
+}
+
 interface Practitioner {
   _id: string;
   name: string;
@@ -29,7 +37,7 @@ export default function PractitionersPage() {
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
   const [loginError, setLoginError] = useState('');
   const [activeTab, setActiveTab] = useState<'directory' | 'dashboard'>('directory');
-  const [disputes, setDisputes] = useState<any[]>([]);
+  const [disputes, setDisputes] = useState<Dispute[]>([]);
 
   const fetchPractitioners = async () => {
     try {
@@ -44,8 +52,8 @@ export default function PractitionersPage() {
 
   const fetchDisputes = async (practitionerId: string) => {
     try {
-      const data = await safeGet<any[]>(`/practitioner/disputes/${practitionerId}`);
-      setDisputes(data.disputes || data || []);
+      const data = await safeGet<{ disputes: Dispute[] }>(`/practitioner/disputes/${practitionerId}`);
+      setDisputes(data.disputes || []);
     } catch (error) {
       console.error('Failed to fetch disputes:', error);
     }
@@ -99,7 +107,7 @@ export default function PractitionersPage() {
         notes,
         practitionerId: currentPractitioner?._id,
       });
-      setDisputes(disputes.map(d => d._id === disputeId ? { ...d, status } : d));
+      setDisputes(disputes.map(d => d._id === disputeId ? { ...d, status: status as any } : d));
       alert(`Dispute ${status}`);
     } catch (error) {
       console.error('Failed to update dispute:', error);
