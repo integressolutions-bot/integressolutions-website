@@ -1,4 +1,4 @@
-// src/lib/api.ts
+ // src/lib/api.ts
 
 // Use relative path so requests go through Netlify proxy
 export const API_BASE = "/api";
@@ -23,10 +23,10 @@ export async function safeGet<T>(path: string): Promise<T> {
     throw new Error(parsed?.message || "Request failed");
   }
 
-  return parsed?.data || parsed as T;
+  return (parsed?.data ?? parsed) as T;
 }
 
-// Helper for POST requests
+// Helper for POST requests (JSON)
 export async function safePost<T>(path: string, body: unknown): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, {
     method: "POST",
@@ -43,11 +43,18 @@ export async function safePost<T>(path: string, body: unknown): Promise<T> {
     throw new Error(text || "Unexpected response from server");
   }
 
-  if (!response.ok || !parsed?.success) {
+  // Some APIs return { success: true, data: T }
+  // Others return T directly. Adjust as needed.
+  if (!response.ok) {
     throw new Error(parsed?.message || "Request failed");
   }
 
-  return parsed.data as T;
+  // If the API uses { success, data } pattern
+  if (parsed && typeof parsed === 'object' && 'success' in parsed && !parsed.success) {
+    throw new Error(parsed.message || "Request failed");
+  }
+
+  return (parsed?.data ?? parsed) as T;
 }
 
 // Helper for file uploads (FormData)
@@ -55,6 +62,7 @@ export async function safeUpload<T>(path: string, formData: FormData): Promise<T
   const response = await fetch(`${API_BASE}${path}`, {
     method: "POST",
     body: formData,
+    // Do not set Content-Type header – browser sets it with boundary
   });
 
   const text = await response.text();
@@ -69,5 +77,10 @@ export async function safeUpload<T>(path: string, formData: FormData): Promise<T
     throw new Error(parsed?.message || "Upload failed");
   }
 
-  return parsed.data || parsed as T;
+  // Some APIs return { success, data }; some return data directly.
+  if (parsed && typeof parsed === 'object' && 'success' in parsed && !parsed.success) {
+    throw new Error(parsed.message || "Upload failed");
+  }
+
+  return (parsed?.data ?? parsed) as T;
 }

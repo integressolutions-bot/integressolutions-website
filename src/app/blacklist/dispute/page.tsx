@@ -1,7 +1,8 @@
-'use client';
+ 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { safeGet, safePost } from '@/lib/api';
 
 interface BlacklistRecord {
   _id: string;
@@ -36,12 +37,10 @@ function DisputeContent() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch blacklist record if recordId provided
     const fetchRecord = async () => {
       if (recordId) {
         try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blacklist/record/${recordId}`);
-          const data = await response.json();
+          const data = await safeGet<BlacklistRecord>(`/blacklist/record/${recordId}`);
           setRecord(data);
         } catch (err) {
           console.error(err);
@@ -49,11 +48,9 @@ function DisputeContent() {
       }
     };
 
-    // Fetch practitioners
     const fetchPractitioners = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/practitioner`);
-        const data = await response.json();
+        const data = await safeGet<{ practitioners: Practitioner[] }>('/practitioner');
         setPractitioners(data.practitioners || []);
       } catch (err) {
         console.error(err);
@@ -77,22 +74,13 @@ function DisputeContent() {
     setError('');
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blacklist/dispute`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          recordId: record?._id,
-          practitionerId: selectedPractitioner,
-          disputeReason,
-          evidence,
-        }),
+      await safePost('/blacklist/dispute', {
+        recordId: record?._id,
+        practitionerId: selectedPractitioner,
+        disputeReason,
+        evidence,
       });
-      const data = await response.json();
-      if (data.success) {
-        setSubmitted(true);
-      } else {
-        setError(data.message || 'Failed to submit dispute');
-      }
+      setSubmitted(true);
     } catch (err: any) {
       setError(err.message || 'Network error');
     } finally {

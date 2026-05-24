@@ -1,7 +1,7 @@
-       'use client';
+ 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import { safeGet, safePost } from '@/lib/api';
 
 interface Practitioner {
   _id: string;
@@ -31,11 +31,9 @@ export default function PractitionersPage() {
   const [activeTab, setActiveTab] = useState<'directory' | 'dashboard'>('directory');
   const [disputes, setDisputes] = useState<any[]>([]);
 
-  // Fetch public practitioners
   const fetchPractitioners = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/practitioner`);
-      const data = await response.json();
+      const data = await safeGet<{ practitioners: Practitioner[] }>('/practitioner');
       setPractitioners(data.practitioners || []);
     } catch (error) {
       console.error('Failed to fetch practitioners:', error);
@@ -44,12 +42,10 @@ export default function PractitionersPage() {
     }
   };
 
-  // Fetch practitioner's disputes (for dashboard)
   const fetchDisputes = async (practitionerId: string) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/practitioner/disputes/${practitionerId}`);
-      const data = await response.json();
-      setDisputes(data.disputes || []);
+      const data = await safeGet<any[]>(`/practitioner/disputes/${practitionerId}`);
+      setDisputes(data.disputes || data || []);
     } catch (error) {
       console.error('Failed to fetch disputes:', error);
     }
@@ -58,7 +54,6 @@ export default function PractitionersPage() {
   useEffect(() => {
     fetchPractitioners();
 
-    // Check if practitioner is logged in
     const savedPractitioner = localStorage.getItem('practitioner');
     if (savedPractitioner) {
       const p = JSON.parse(savedPractitioner);
@@ -73,12 +68,7 @@ export default function PractitionersPage() {
     e.preventDefault();
     setLoginError('');
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/practitioner/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(loginForm),
-      });
-      const data = await response.json();
+      const data = await safePost<{ success: boolean; practitioner: Practitioner }>('/practitioner/login', loginForm);
       if (data.success) {
         setCurrentPractitioner(data.practitioner);
         setIsAuthenticated(true);
@@ -86,7 +76,7 @@ export default function PractitionersPage() {
         fetchDisputes(data.practitioner._id);
         setActiveTab('dashboard');
       } else {
-        setLoginError(data.message || 'Invalid credentials');
+        setLoginError('Invalid credentials');
       }
     } catch (err: any) {
       setLoginError(err.message || 'Login failed');
@@ -103,16 +93,14 @@ export default function PractitionersPage() {
 
   const updateDisputeStatus = async (disputeId: string, status: string, notes?: string) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/practitioner/disputes/update`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ disputeId, status, notes, practitionerId: currentPractitioner?._id }),
+      await safePost('/practitioner/disputes/update', {
+        disputeId,
+        status,
+        notes,
+        practitionerId: currentPractitioner?._id,
       });
-      const data = await response.json();
-      if (data.success) {
-        setDisputes(disputes.map(d => d._id === disputeId ? { ...d, status } : d));
-        alert(`Dispute ${status}`);
-      }
+      setDisputes(disputes.map(d => d._id === disputeId ? { ...d, status } : d));
+      alert(`Dispute ${status}`);
     } catch (error) {
       console.error('Failed to update dispute:', error);
     }
