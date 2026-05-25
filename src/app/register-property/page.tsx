@@ -10,10 +10,6 @@ interface PropertyFormData {
   customSubCategory: string;
   serialNumber: string;
   description: string;
-  ownerName: string;
-  ownerEmail: string;
-  ownerPhone: string;
-  location: string;
   purchaseDate: string;
   proofOfOwnership: string;
   additionalNotes: string;
@@ -53,10 +49,6 @@ export default function RegisterPropertyPage() {
     customSubCategory: "",
     serialNumber: "",
     description: "",
-    ownerName: "",
-    ownerEmail: "",
-    ownerPhone: "",
-    location: "",
     purchaseDate: "",
     proofOfOwnership: "",
     additionalNotes: ""
@@ -87,13 +79,14 @@ export default function RegisterPropertyPage() {
       : form.subCategory;
 
     try {
-      const result = await safePost<{ psid: string; propertyId: string }>("/properties/register", {
+      const result = await safePost<{ serial?: string; psid?: string; propertyId?: string }>("/psid/register", {
         ...form,
         subCategory: finalSubCategory
-      });
-      setSuccess(`Property registered successfully! Your PSID: ${result.psid}`);
+      }, true);
+      const serial = result.serial || result.psid || form.serialNumber;
+      setSuccess(`Property registered successfully. Your PSID: ${serial}`);
       setTimeout(() => {
-        router.push(`/verify-property?psid=${result.psid}&success=true`);
+        router.push(`/verify-property?psid=${serial}&success=true`);
       }, 2000);
     } catch (err: any) {
       setError(err.message || "Registration failed. Please try again.");
@@ -105,17 +98,17 @@ export default function RegisterPropertyPage() {
   return (
     <div className="max-w-3xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-2">Register Property</h1>
-      <p className="text-gray-600 mb-6">Register your item to generate a unique PSID for verification and protection</p>
+      <p className="text-gray-600 mb-6">Register your item to generate a unique PSID. You must be logged in.</p>
 
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          ❌ {error}
+          {error}
         </div>
       )}
 
       {success && (
         <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-          ✅ {success}
+          {success}
         </div>
       )}
 
@@ -198,55 +191,6 @@ export default function RegisterPropertyPage() {
             className="w-full p-2 border rounded"
             required
           />
-        </div>
-
-        {/* Owner Information */}
-        <div className="grid md:grid-cols-2 gap-4">
-          <div>
-            <label className="block font-semibold mb-1">Owner Name *</label>
-            <input
-              type="text"
-              name="ownerName"
-              value={form.ownerName}
-              onChange={handleChange}
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
-          <div>
-            <label className="block font-semibold mb-1">Owner Email *</label>
-            <input
-              type="email"
-              name="ownerEmail"
-              value={form.ownerEmail}
-              onChange={handleChange}
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
-          <div>
-            <label className="block font-semibold mb-1">Owner Phone *</label>
-            <input
-              type="tel"
-              name="ownerPhone"
-              value={form.ownerPhone}
-              onChange={handleChange}
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
-          <div>
-            <label className="block font-semibold mb-1">Location/Address *</label>
-            <input
-              type="text"
-              name="location"
-              value={form.location}
-              onChange={handleChange}
-              placeholder="City, State or full address"
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
         </div>
 
         {/* Purchase Date */}

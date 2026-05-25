@@ -23,7 +23,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const dashboardData = await safeGet<DashboardData>('/dashboard');
+        const dashboardData = await safeGet<DashboardData>('/dashboard', true);
         setData(dashboardData);
       } catch (err: any) {
         setError(err.message || 'Failed to load dashboard');

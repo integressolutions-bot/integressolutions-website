@@ -25,13 +25,13 @@ export default function PropertyCard({ property, showQR = true }: PropertyCardPr
   return (
     <div className="border rounded-xl p-6 shadow hover:shadow-lg transition">
       <h2 className="text-xl font-bold mb-2">{property.address || property.psid}</h2>
-      
+
       <div className="space-y-1 text-sm">
         <p><strong>PSID:</strong> <span className="font-mono">{property.psid}</span></p>
         <p><strong>Owner:</strong> {property.ownerName}</p>
         {property.category && <p><strong>Category:</strong> {property.category}</p>}
         <p>
-          <strong>Status:</strong> 
+          <strong>Status:</strong>
           <span className={`ml-2 px-2 py-0.5 rounded text-xs ${getStatusColor(property.status)}`}>
             {property.status}
           </span>

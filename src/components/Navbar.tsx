@@ -1,10 +1,25 @@
- "use client";
+"use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<unknown>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) setUser(JSON.parse(savedUser));
+  }, []);
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
+    router.push("/");
+  };
 
   return (
     <header className="container">
@@ -16,8 +31,18 @@ export function Navbar() {
         <div className={`nav-links ${mobileMenuOpen ? "open" : ""}`}>
           <Link href="/psid">PSID</Link>
           <Link href="/blacklist">Blacklist</Link>
-          <Link href="/dashboard">Dashboard</Link>
-          <Link href="/practitioners">Practitioners</Link>
+          {user ? (
+            <>
+              <Link href="/dashboard">Dashboard</Link>
+              <Link href="/practitioners">Practitioners</Link>
+              <button onClick={logout} className="nav-button">Logout</button>
+            </>
+          ) : (
+            <>
+              <Link href="/login">Login</Link>
+              <Link href="/register">Register</Link>
+            </>
+          )}
           <Link href="/about">About</Link>
           <Link href="/contact">Contact</Link>
         </div>
@@ -37,6 +62,14 @@ export function Navbar() {
           .nav-links { display: none; flex-direction: column; width: 100%; padding: 1rem 0; }
           .nav-links.open { display: flex; }
           .nav { flex-wrap: wrap; }
+        }
+        .nav-button {
+          background: transparent;
+          border: 0;
+          color: #ffb4b4;
+          cursor: pointer;
+          font: inherit;
+          padding: 0;
         }
       `}</style>
     </header>
