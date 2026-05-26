@@ -1,36 +1,37 @@
- [build]
+   [build]
   command = "npm run build"
   publish = ".next"
 
-# 1. PSID routes (frontend /api/psid/* -> backend /api/mobile/psid/*)
+# PSID – frontend /api/psid/* → backend /api/mobile/psid/*
 [[redirects]]
   from = "/api/psid/*"
   to = "https://integres-backend-production.up.railway.app/api/mobile/psid/:splat"
   status = 200
   force = true
 
-# 2. Blacklist routes (frontend /api/blacklist/* -> backend /api/mobile/blacklist/*)
+# Blacklist – frontend /api/blacklist/* → backend /api/mobile/blacklist/*
 [[redirects]]
   from = "/api/blacklist/*"
   to = "https://integres-backend-production.up.railway.app/api/mobile/blacklist/:splat"
   status = 200
   force = true
 
-# 3. Practitioner routes (frontend /api/practitioner/* -> backend /api/practitioner/*)
+# Practitioner – frontend /api/practitioner/* → backend /api/practitioner/*
+# (if practitioner is a separate app, not under blacklist)
 [[redirects]]
   from = "/api/practitioner/*"
   to = "https://integres-backend-production.up.railway.app/api/practitioner/:splat"
   status = 200
   force = true
 
-# 4. General fallback for other /api/* (auth, admin, etc.)
+# Fallback for any other /api/* (auth, admin, etc.)
 [[redirects]]
   from = "/api/*"
   to = "https://integres-backend-production.up.railway.app/api/:splat"
   status = 200
   force = true
 
-# 5. Security headers (optional)
+# Security headers (optional)
 [[headers]]
   for = "/*"
   [headers.values]
