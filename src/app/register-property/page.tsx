@@ -1,4 +1,4 @@
-'use client';
+ 'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -17,8 +17,6 @@ export default function RegisterPropertyPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  
-  // Form state
   const [form, setForm] = useState({
     category: "electronics",
     subCategory: "",
@@ -30,11 +28,9 @@ export default function RegisterPropertyPage() {
     additionalNotes: ""
   });
 
-  // Check authentication on mount
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      // Redirect to login page, passing the intended destination
       router.push('/login?redirect=/register-property');
     } else {
       setIsCheckingAuth(false);
@@ -58,11 +54,9 @@ export default function RegisterPropertyPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     const finalSubCategory = (form.subCategory === "Other" || form.subCategory === "Specify")
       ? form.customSubCategory
       : form.subCategory;
-
     try {
       const result = await safePost("/psid/register", { ...form, subCategory: finalSubCategory }, true);
       router.push(`/verify-property?psid=${result.serial}&success=true`);
@@ -74,11 +68,7 @@ export default function RegisterPropertyPage() {
   };
 
   if (isCheckingAuth) {
-    return (
-      <div className="max-w-3xl mx-auto p-6 text-center">
-        <p>Checking authentication...</p>
-      </div>
-    );
+    return <div className="p-6 text-center">Checking authentication...</div>;
   }
 
   return (
