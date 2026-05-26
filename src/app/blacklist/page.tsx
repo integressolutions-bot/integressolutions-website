@@ -22,7 +22,6 @@ export default function BlacklistPage() {
   const [loading, setLoading] = useState(false);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
-  // Load recent searches from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem("blacklist_searches");
     if (saved) {
@@ -43,18 +42,11 @@ export default function BlacklistPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim()) return;
-    
     setLoading(true);
     setError("");
     setResult(null);
-    
     try {
-      // Use the correct endpoint for your backend
-      const data = await safePost<BlacklistResult>("/blacklist/check", { 
-        query: query.trim(),
-        // Optional: include user context if authenticated
-        // userId: getCurrentUserId(),
-      });
+      const data = await safePost<BlacklistResult>("/blacklist/check", { query: query.trim() });
       setResult(data);
       saveSearch(query.trim());
     } catch (err: any) {
@@ -66,193 +58,75 @@ export default function BlacklistPage() {
 
   const handleQuickSearch = (term: string) => {
     setQuery(term);
-    // Auto-submit after a brief delay
-    setTimeout(() => {
-      const fakeEvent = { preventDefault: () => {} } as React.FormEvent;
-      submit(fakeEvent);
-    }, 100);
+    setTimeout(() => submit({ preventDefault: () => {} } as React.FormEvent), 100);
   };
 
   return (
-    <div style={{ maxWidth: "800px", margin: "0 auto", padding: "2rem" }}>
-      <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>Integres Blacklist</h1>
-      
-      <p style={{ marginBottom: "1.5rem", color: "#666" }}>
+    <div className="max-w-3xl mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-4">Integres Blacklist</h1>
+      <p className="text-gray-600 mb-6">
         Check blacklist records for free. Reporting and removal requests require payment under the platform fee policy.
       </p>
-      
-      {/* Pricing Cards */}
-      <div style={{ 
-        display: "flex", 
-        gap: "1rem", 
-        marginBottom: "2rem",
-        flexWrap: "wrap",
-        background: "#f5f5f5",
-        padding: "1rem",
-        borderRadius: "8px"
-      }}>
-        <div style={{ flex: 1 }}>
-          <span>Check / Search</span>
-          <strong style={{ display: "block", fontSize: "1.25rem", color: "#10b981" }}>Free</strong>
-        </div>
-        <div style={{ flex: 1 }}>
-          <span>Report - Individuals</span>
-          <strong style={{ display: "block", fontSize: "1.25rem" }}>From ₦15,000</strong>
-        </div>
-        <div style={{ flex: 1 }}>
-          <span>Report - Companies</span>
-          <strong style={{ display: "block", fontSize: "1.25rem" }}>From ₦30,000</strong>
-        </div>
+
+      <div className="bg-gray-100 p-4 rounded-lg flex gap-4 mb-6 flex-wrap">
+        <div><span className="font-medium">Check / Search</span><br/><span className="text-green-600 font-bold">Free</span></div>
+        <div><span className="font-medium">Report - Individuals</span><br/><span className="font-bold">From ₦15,000</span></div>
+        <div><span className="font-medium">Report - Companies</span><br/><span className="font-bold">From ₦30,000</span></div>
       </div>
-      
-      {/* Search Form */}
-      <form onSubmit={submit} style={{ marginBottom: "2rem" }}>
-        <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+
+      <form onSubmit={submit} className="mb-6">
+        <div className="flex gap-2">
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Enter a name, company, or identifier"
             required
-            style={{
-              flex: 1,
-              padding: "0.75rem",
-              border: "1px solid #ccc",
-              borderRadius: "8px",
-              fontSize: "1rem"
-            }}
+            className="flex-1 p-2 border rounded"
           />
           <button
             type="submit"
             disabled={loading}
-            style={{
-              padding: "0.75rem 1.5rem",
-              background: loading ? "#ccc" : "#2563eb",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              cursor: loading ? "not-allowed" : "pointer",
-              fontSize: "1rem"
-            }}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400"
           >
             {loading ? "Checking..." : "Run Free Check"}
           </button>
         </div>
       </form>
-      
-      {/* Loading Spinner */}
-      {loading && (
-        <div style={{ textAlign: "center", padding: "2rem" }}>
-          <div style={{ 
-            display: "inline-block",
-            width: "40px",
-            height: "40px",
-            border: "4px solid #f3f3f3",
-            borderTop: "4px solid #2563eb",
-            borderRadius: "50%",
-            animation: "spin 1s linear infinite"
-          }} />
-          <style>{`
-            @keyframes spin {
-              0% { transform: rotate(0deg); }
-              100% { transform: rotate(360deg); }
-            }
-          `}</style>
-        </div>
-      )}
-      
-      {/* Error Display */}
-      {error && (
-        <div style={{
-          background: "#fee2e2",
-          border: "1px solid #fecaca",
-          color: "#dc2626",
-          padding: "1rem",
-          borderRadius: "8px",
-          marginBottom: "1rem"
-        }}>
-          ⚠️ {error}
-        </div>
-      )}
-      
-      {/* Recent Searches */}
+
+      {loading && <div className="text-center py-4">Loading...</div>}
+      {error && <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>}
+
       {recentSearches.length > 0 && !result && !loading && (
-        <div style={{ marginBottom: "1rem" }}>
-          <p style={{ fontSize: "0.875rem", color: "#666", marginBottom: "0.5rem" }}>Recent searches:</p>
-          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-            {recentSearches.map((term) => (
-              <button
-                key={term}
-                onClick={() => handleQuickSearch(term)}
-                style={{
-                  background: "#f0f0f0",
-                  border: "none",
-                  padding: "0.25rem 0.75rem",
-                  borderRadius: "16px",
-                  cursor: "pointer",
-                  fontSize: "0.875rem"
-                }}
-              >
+        <div className="mb-4">
+          <p className="text-sm text-gray-500 mb-1">Recent searches:</p>
+          <div className="flex gap-2 flex-wrap">
+            {recentSearches.map(term => (
+              <button key={term} onClick={() => handleQuickSearch(term)} className="bg-gray-200 px-2 py-1 rounded text-sm">
                 {term}
               </button>
             ))}
           </div>
         </div>
       )}
-      
-      {/* Results Display */}
+
       {result && (
-        <div style={{
-          background: result.found ? "#fef3c7" : "#d1fae5",
-          border: `1px solid ${result.found ? "#fde68a" : "#a7f3d0"}`,
-          borderRadius: "8px",
-          padding: "1rem",
-          marginTop: "1rem"
-        }}>
-          <h3 style={{ marginBottom: "0.5rem" }}>
-            {result.found ? "⚠️ Record Found" : "✅ Clean Record"}
-          </h3>
-          
+        <div className={`p-4 rounded-lg ${result.found ? 'bg-yellow-50 border border-yellow-200' : 'bg-green-50 border border-green-200'}`}>
+          <h2 className="font-bold text-lg">{result.found ? '⚠️ Record Found' : '✅ Clean Record'}</h2>
           {result.found && result.records ? (
-            <div>
-              {result.records.map((record, idx) => (
-                <div key={idx} style={{ marginBottom: "1rem", paddingBottom: "1rem", borderBottom: "1px solid #eee" }}>
-                  <p><strong>Name:</strong> {record.name}</p>
-                  <p><strong>Type:</strong> {record.type}</p>
-                  <p><strong>Reason:</strong> {record.reason}</p>
-                  <p><strong>Reported:</strong> {new Date(record.dateReported).toLocaleDateString()}</p>
-                  <p>
-                    <strong>Status:</strong> 
-                    <span style={{ 
-                      marginLeft: "0.5rem",
-                      padding: "0.125rem 0.5rem",
-                      borderRadius: "9999px",
-                      fontSize: "0.75rem",
-                      background: record.status === 'approved' ? '#fee2e2' : '#fef3c7',
-                      color: record.status === 'approved' ? '#dc2626' : '#d97706'
-                    }}>
-                      {record.status}
-                    </span>
-                  </p>
-                </div>
-              ))}
-            </div>
+            result.records.map((record, idx) => (
+              <div key={idx} className="mt-3 pt-3 border-t">
+                <p><strong>Name:</strong> {record.name}</p>
+                <p><strong>Type:</strong> {record.type}</p>
+                <p><strong>Reason:</strong> {record.reason}</p>
+                <p><strong>Reported:</strong> {new Date(record.dateReported).toLocaleDateString()}</p>
+                <p><strong>Status:</strong> <span className={`capitalize ${record.status === 'approved' ? 'text-red-600' : 'text-yellow-600'}`}>{record.status}</span></p>
+              </div>
+            ))
           ) : (
             <p>No blacklist records found for "{query}".</p>
           )}
-          
-          <button
-            onClick={() => window.location.href = "/report"}
-            style={{
-              marginTop: "1rem",
-              background: "#dc2626",
-              color: "white",
-              border: "none",
-              padding: "0.5rem 1rem",
-              borderRadius: "8px",
-              cursor: "pointer"
-            }}
-          >
+          <button onClick={() => window.location.href = '/report'} className="mt-4 bg-red-600 text-white px-4 py-2 rounded">
             Report an Issue
           </button>
         </div>
