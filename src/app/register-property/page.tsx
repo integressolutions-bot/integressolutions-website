@@ -41,8 +41,14 @@ export default function RegisterPropertyPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // ✅ FIXED: use functional update to preserve other form fields
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setForm({ category: e.target.value, subCategory: "", customSubCategory: "" });
+    setForm((prev) => ({
+      ...prev,
+      category: e.target.value,
+      subCategory: '',
+      customSubCategory: '',
+    }));
   };
 
   const getSubCategories = () => {
