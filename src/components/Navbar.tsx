@@ -33,8 +33,9 @@ export function Navbar() {
           <Link href="/blacklist">Blacklist</Link>
           {user ? (
             <>
-              <Link href="/dashboard">Dashboard</Link>
-              <Link href="/practitioners">Practitioners</Link>
+          <Link href="/report">Report</Link>
+           <Link href="/register-property"> Register Property</Link>
+           <Link href="/practitioners">Practitioners</Link>
               <button onClick={logout} className="nav-button">Logout</button>
             </>
           ) : (
