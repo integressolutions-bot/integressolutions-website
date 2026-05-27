@@ -1,13 +1,26 @@
- 'use client';
+'use client';
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { safePost } from '@/lib/api';
 
+// Define the expected response type from the login API
+interface LoginResponse {
+  token: string;
+  user: {
+    id: string;
+    fullName: string;
+    email: string;
+    role: string;
+  };
+}
+
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirect') || '/register-property';
+  const redirectParam = searchParams.get('redirect') || '/register-property';
+  const redirectTo = redirectParam as any;
+
   const [form, setForm] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -16,7 +29,9 @@ function LoginContent() {
   // If already logged in, redirect immediately
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (token) router.push(redirectTo);
+    if (token) {
+      router.push(redirectTo);
+    }
   }, [router, redirectTo]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -24,7 +39,8 @@ function LoginContent() {
     setLoading(true);
     setError('');
     try {
-      const data = await safePost('/auth/login', form);
+      // Type the response from safePost
+      const data = await safePost<LoginResponse>('/auth/login', form);
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       router.push(redirectTo);
