@@ -1,22 +1,29 @@
- 'use client';
+'use client';
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { Route } from 'next';
 import { safePost } from '@/lib/api';
 
+// Define the expected response shape from the login API
+interface LoginResponse {
+  token: string;
+  user: {
+    id: string;
+    fullName: string;
+    email: string;
+    role: string;
+  };
+}
+
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // ✅ Fixed: safely cast the redirect target to Route
+  // ✅ Cast redirect target to Route (satisfies Next.js typedRoutes)
   const redirectTo = (searchParams.get('redirect') || '/register-property') as Route;
 
-  const [form, setForm] = useState({
-    email: '',
-    password: '',
-  });
-
+  const [form, setForm] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -31,12 +38,12 @@ function LoginContent() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     setLoading(true);
     setError('');
 
     try {
-      const data = await safePost('/auth/login', form);
+      // ✅ Explicitly type the response from safePost
+      const data = await safePost<LoginResponse>('/auth/login', form);
 
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
@@ -78,7 +85,6 @@ function LoginContent() {
             onChange={(e) => setForm({ ...form, password: e.target.value })}
             required
           />
-
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
