@@ -4,9 +4,16 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+interface User {
+  id: string;
+  fullName: string;
+  email: string;
+  role: string;
+}
+
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [user, setUser] = useState<unknown>(null);
+  const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -27,16 +34,18 @@ export function Navbar() {
         <Link href="/" style={{ fontWeight: 800, fontSize: "1.2rem" }}>
           Integres Solutions
         </Link>
-        
+
         <div className={`nav-links ${mobileMenuOpen ? "open" : ""}`}>
           <Link href="/psid">PSID</Link>
           <Link href="/blacklist">Blacklist</Link>
           {user ? (
             <>
-          <Link href="/report">Report</Link>
-           <Link href="/register-property"> Register Property</Link>
-           <Link href="/practitioners">Practitioners</Link>
-              <button onClick={logout} className="nav-button">Logout</button>
+              <Link href="/report">Report</Link>
+              <Link href="/register-property">Register Property</Link>
+              <Link href="/practitioners">Practitioners</Link>
+              <button onClick={logout} className="nav-button">
+                Logout
+              </button>
             </>
           ) : (
             <>
@@ -47,22 +56,39 @@ export function Navbar() {
           <Link href="/about">About</Link>
           <Link href="/contact">Contact</Link>
         </div>
-        
-        <button 
+
+        <button
           className="mobile-menu-button"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          style={{ display: "none", background: "none", border: "none", color: "white", fontSize: "1.5rem" }}
+          style={{
+            display: "none",
+            background: "none",
+            border: "none",
+            color: "white",
+            fontSize: "1.5rem",
+          }}
         >
           ☰
         </button>
       </nav>
-      
+
       <style jsx>{`
         @media (max-width: 700px) {
-          .mobile-menu-button { display: block !important; }
-          .nav-links { display: none; flex-direction: column; width: 100%; padding: 1rem 0; }
-          .nav-links.open { display: flex; }
-          .nav { flex-wrap: wrap; }
+          .mobile-menu-button {
+            display: block !important;
+          }
+          .nav-links {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            padding: 1rem 0;
+          }
+          .nav-links.open {
+            display: flex;
+          }
+          .nav {
+            flex-wrap: wrap;
+          }
         }
         .nav-button {
           background: transparent;
