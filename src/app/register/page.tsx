@@ -1,8 +1,18 @@
-'use client';
+ 'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { safePost } from '@/lib/api';
+
+interface RegisterResponse {
+  token: string;
+  user: {
+    id: string;
+    fullName: string;
+    email: string;
+    role: string;
+  };
+}
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -16,7 +26,7 @@ export default function RegisterPage() {
     setLoading(true);
     setError('');
     try {
-      const data = await safePost('/auth/register', form);
+      const data = await safePost<RegisterResponse>('/auth/register', form);
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       router.push('/register-property');
