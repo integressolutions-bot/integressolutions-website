@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -31,18 +32,19 @@ export function Navbar() {
   return (
     <header className="container">
       <nav className="nav">
-        <Link href="/" style={{ fontWeight: 800, fontSize: "1.2rem" }}>
-          Integres Solutions
+        <Link href="/" className="flex items-center gap-2" style={{ fontWeight: 800, fontSize: "1.2rem" }}>
+          <Image src="/logo.png" alt="Integres Solutions" width={40} height={40} />
+          <span>Integres Solutions</span>
         </Link>
 
         <div className={`nav-links ${mobileMenuOpen ? "open" : ""}`}>
           <Link href="/psid">PSID</Link>
           <Link href="/blacklist">Blacklist</Link>
+          <Link href="/practitioners">Practitioners</Link>
           {user ? (
             <>
               <Link href="/report">Report</Link>
               <Link href="/register-property">Register Property</Link>
-              <Link href="/practitioners">Practitioners</Link>
               <button onClick={logout} className="nav-button">
                 Logout
               </button>

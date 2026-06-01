@@ -1,0 +1,14 @@
+{
+  "Navbar": {
+    "home": "Home",
+    "psid": "PSID",
+    "blacklist": "Blacklist",
+    "report": "Report",
+    "registerProperty": "Register Property",
+    "practitioners": "Practitioners",
+    "login": "Login",
+    "register": "Register",
+    "about": "About",
+    "contact": "Contact"
+  }
+}

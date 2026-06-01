@@ -77,13 +77,13 @@ function LoginContent() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:bg-gray-400"
+          className="w-full bg-red-600 text-white py-2 rounded hover:bg-gray-600 disabled:bg-gray-400 transition"
         >
           {loading ? 'Signing in...' : 'Sign in'}
         </button>
       </form>
       <p className="text-center mt-4 text-gray-600">
-        Don't have an account? <a href="/register" className="text-blue-600">Register</a>
+        Don't have an account? <a href="/register" className="text-red-600">Register</a>
       </p>
     </div>
   );

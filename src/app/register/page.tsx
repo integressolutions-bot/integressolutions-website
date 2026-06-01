@@ -118,13 +118,13 @@ export default function RegisterPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:bg-gray-400"
+          className="w-full bg-red-600 text-white py-2 rounded hover:bg-gray-600 disabled:bg-gray-400 transition"
         >
           {loading ? 'Registering...' : 'Register'}
         </button>
       </form>
       <p className="text-center mt-4 text-gray-600">
-        Already have an account? <a href="/login" className="text-blue-600">Login</a>
+        Already have an account? <a href="/login" className="text-red-600">Login</a>
       </p>
     </div>
   );

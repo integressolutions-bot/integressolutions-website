@@ -1,4 +1,4 @@
-{
+ {
   "name": "integres-frontend",
   "version": "1.0.0",
   "private": true,
@@ -8,9 +8,13 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "overrides": {
+    "postcss": "8.5.15"
+  },
   "dependencies": {
     "html5-qrcode": "^2.3.8",
     "next": "15.5.18",
+    "next-intl": "^4.13.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-qr-code": "^2.0.21"
