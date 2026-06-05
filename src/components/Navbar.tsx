@@ -32,9 +32,8 @@ export function Navbar() {
   return (
     <header className="container">
       <nav className="nav">
-        <Link href="/" className="flex items-center gap-2" style={{ fontWeight: 800, fontSize: "1.2rem" }}>
-          <Image src="/logo.png" alt="Integres Solutions" width={40} height={40} />
-          <span>Integres Solutions</span>
+        <Link href="/" className="flex items-center">
+             <Image src="/logo.png" alt="Integres Solutions" width={120} height={40} priority />
         </Link>
 
         <div className={`nav-links ${mobileMenuOpen ? "open" : ""}`}>
