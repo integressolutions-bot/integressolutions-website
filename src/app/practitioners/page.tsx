@@ -1,4 +1,4 @@
- 'use client';
+'use client';
 
 import { useEffect, useState } from 'react';
 import { safeGet, safePost } from '@/lib/api';
@@ -129,13 +129,13 @@ export default function PractitionersPage() {
         <div className="flex gap-4 border-b">
           <button
             onClick={() => setActiveTab('directory')}
-            className={`pb-2 px-4 ${activeTab === 'directory' ? 'border-b-2 border-blue-600 font-semibold' : ''}`}
+            className={`pb-2 px-4 ${activeTab === 'directory' ? 'border-b-2 border-red-600 font-semibold' : ''}`}
           >
             Find a Practitioner
           </button>
           <button
             onClick={() => setActiveTab('dashboard')}
-            className={`pb-2 px-4 ${activeTab === 'dashboard' ? 'border-b-2 border-blue-600 font-semibold' : ''}`}
+            className={`pb-2 px-4 ${activeTab === 'dashboard' ? 'border-b-2 border-red-600 font-semibold' : ''}`}
           >
             {isAuthenticated ? 'My Dashboard' : 'Practitioner Login'}
           </button>
@@ -163,7 +163,7 @@ export default function PractitionersPage() {
               placeholder="Filter by name, specialization, or NBA branch..."
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              className="w-full p-3 border rounded-lg"
+              className="w-full p-3 border rounded-lg text-gray-900 bg-white"
             />
           </div>
 
@@ -193,7 +193,7 @@ export default function PractitionersPage() {
 
                 <button
                   onClick={() => window.location.href = `/blacklist/dispute?practitionerId=${practitioner._id}`}
-                  className="w-full mt-4 bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+                  className="w-full mt-4 bg-red-600 text-white py-2 rounded hover:bg-gray-600 transition"
                 >
                   Request Dispute Resolution
                 </button>
@@ -213,7 +213,6 @@ export default function PractitionersPage() {
       {activeTab === 'dashboard' && (
         <>
           {!isAuthenticated ? (
-            // Login Form
             <div className="max-w-md mx-auto">
               <div className="text-center mb-8">
                 <span className="text-5xl">⚖️</span>
@@ -234,7 +233,7 @@ export default function PractitionersPage() {
                     type="email"
                     value={loginForm.email}
                     onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
-                    className="w-full p-2 border rounded"
+                    className="w-full p-2 border rounded text-gray-900 bg-white"
                     required
                   />
                 </div>
@@ -245,18 +244,22 @@ export default function PractitionersPage() {
                     type="password"
                     value={loginForm.password}
                     onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
-                    className="w-full p-2 border rounded"
+                    className="w-full p-2 border rounded text-gray-900 bg-white"
                     required
                   />
                 </div>
                 
-                <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+                <button type="submit" className="w-full bg-red-600 text-white py-2 rounded hover:bg-gray-600 transition">
                   Access Portal
                 </button>
               </form>
+
+              {/* ✅ Register link added here */}
+              <p className="text-center mt-4">
+                <a href="/practitioners/register" className="text-red-600 hover:underline">Register as a practitioner</a>
+              </p>
             </div>
           ) : (
-            // Practitioner Dashboard
             <div>
               <h1 className="text-2xl font-bold mb-2">Practitioner Dashboard</h1>
               <p className="text-gray-600 mb-6">Manage dispute cases and client requests</p>

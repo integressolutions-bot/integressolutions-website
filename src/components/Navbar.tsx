@@ -33,7 +33,7 @@ export function Navbar() {
     <header className="container">
       <nav className="nav">
         <Link href="/" className="flex items-center">
-             <Image src="/logo.png" alt="Integres Solutions" width={120} height={40} priority />
+             <Image src="/logo.png" alt="Integres Solutions" width={240} height={80} priority />
         </Link>
 
         <div className={`nav-links ${mobileMenuOpen ? "open" : ""}`}>

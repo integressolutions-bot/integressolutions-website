@@ -1,9 +1,20 @@
- 'use client';
+'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { safePost } from '@/lib/api';
+
+const COUNTRIES = [
+  { code: 'NG', name: 'Nigeria', barAssociations: ['Nigerian Bar Association (NBA)'] },
+  { code: 'GH', name: 'Ghana', barAssociations: ['Ghana Bar Association (GBA)'] },
+  { code: 'ZA', name: 'South Africa', barAssociations: ['Law Society of South Africa (LSSA)'] },
+  { code: 'KE', name: 'Kenya', barAssociations: ['Law Society of Kenya (LSK)'] },
+  { code: 'UG', name: 'Uganda', barAssociations: ['Uganda Law Society (ULS)'] },
+  { code: 'US', name: 'United States', barAssociations: ['American Bar Association (ABA)'] },
+  { code: 'GB', name: 'United Kingdom', barAssociations: ['Law Society of England and Wales'] },
+  { code: 'IE', name: 'Ireland', barAssociations: ['Law Society of Ireland'] },
+];
 
 export default function PractitionerRegisterPage() {
   const router = useRouter();
@@ -12,8 +23,9 @@ export default function PractitionerRegisterPage() {
     email: '',
     password: '',
     confirmPassword: '',
+    country: 'NG',
+    barAssociation: '',
     barNumber: '',
-    nbaBranch: '',
     specialization: '',
     yearsOfExperience: '',
     location: '',
@@ -25,8 +37,13 @@ export default function PractitionerRegisterPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
+  const selectedCountry = COUNTRIES.find(c => c.code === form.country);
+  const barOptions = selectedCountry?.barAssociations || [];
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+    if (name === 'country') setForm(prev => ({ ...prev, barAssociation: '' }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -35,16 +52,17 @@ export default function PractitionerRegisterPage() {
       setError('Passwords do not match');
       return;
     }
-    setError('');
     setLoading(true);
+    setError('');
     try {
       await safePost('/practitioner/register', {
         fullName: form.fullName,
         email: form.email,
         password: form.password,
         phone: form.phone,
+        country: form.country,
+        barAssociation: form.barAssociation,
         barNumber: form.barNumber,
-        nbaBranch: form.nbaBranch,
         specialization: form.specialization,
         yearsOfExperience: parseInt(form.yearsOfExperience),
         location: form.location,
@@ -61,12 +79,8 @@ export default function PractitionerRegisterPage() {
   if (success) {
     return (
       <div className="max-w-md mx-auto p-6 text-center">
-        <div className="bg-green-100 border border-green-400 text-green-700 p-4 rounded mb-4">
-          ✅ Registration successful! You can now log in.
-        </div>
-        <Link href="/practitioners" className="text-blue-600 underline">
-          Go to Practitioner Login
-        </Link>
+        <div className="bg-green-100 text-green-700 p-4 rounded mb-4">✅ Registration submitted for review. You will be notified once verified.</div>
+        <Link href="/practitioners" className="text-red-600 underline">Go to Practitioner Login</Link>
       </div>
     );
   }
@@ -74,139 +88,42 @@ export default function PractitionerRegisterPage() {
   return (
     <div className="max-w-2xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-2">Practitioner Registration</h1>
-      <p className="text-gray-600 mb-6">Join the Integres network of NBA‑verified legal practitioners.</p>
-      
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 p-3 rounded mb-4">
-          ❌ {error}
-        </div>
-      )}
-
+      <p className="text-gray-600 mb-6">Join the Integres network of verified legal practitioners worldwide.</p>
+      {error && <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid md:grid-cols-2 gap-4">
-          <input
-            name="fullName"
-            placeholder="Full name *"
-            value={form.fullName}
-            onChange={handleChange}
-            required
-            className="border p-2 rounded"
-          />
-          <input
-            name="email"
-            type="email"
-            placeholder="Email *"
-            value={form.email}
-            onChange={handleChange}
-            required
-            className="border p-2 rounded"
-          />
+          <input name="fullName" placeholder="Full name *" value={form.fullName} onChange={handleChange} required className="border p-2 rounded text-gray-900 bg-white" />
+          <input name="email" type="email" placeholder="Email *" value={form.email} onChange={handleChange} required className="border p-2 rounded text-gray-900 bg-white" />
           
-          {/* Password field with visibility toggle */}
           <div className="relative">
-            <input
-              name="password"
-              type={showPassword ? 'text' : 'password'}
-              placeholder="Password *"
-              value={form.password}
-              onChange={handleChange}
-              required
-              className="border p-2 rounded w-full pr-10"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500"
-            >
-              {showPassword ? '👁️' : '🔒'}
-            </button>
+            <input type={showPassword ? 'text' : 'password'} name="password" placeholder="Password *" value={form.password} onChange={handleChange} required className="border p-2 rounded w-full pr-10 text-gray-900 bg-white" />
+            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 pr-3 flex items-center">{showPassword ? '👁️' : '🔒'}</button>
           </div>
-          
-          {/* Confirm Password field with visibility toggle */}
           <div className="relative">
-            <input
-              name="confirmPassword"
-              type={showConfirmPassword ? 'text' : 'password'}
-              placeholder="Confirm password *"
-              value={form.confirmPassword}
-              onChange={handleChange}
-              required
-              className="border p-2 rounded w-full pr-10"
-            />
-            <button
-              type="button"
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500"
-            >
-              {showConfirmPassword ? '👁️' : '🔒'}
-            </button>
+            <input type={showConfirmPassword ? 'text' : 'password'} name="confirmPassword" placeholder="Confirm password *" value={form.confirmPassword} onChange={handleChange} required className="border p-2 rounded w-full pr-10 text-gray-900 bg-white" />
+            <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute inset-y-0 right-0 pr-3 flex items-center">{showConfirmPassword ? '👁️' : '🔒'}</button>
           </div>
-          
-          <input
-            name="barNumber"
-            placeholder="NBA Bar Number *"
-            value={form.barNumber}
-            onChange={handleChange}
-            required
-            className="border p-2 rounded"
-          />
-          <input
-            name="nbaBranch"
-            placeholder="NBA Branch *"
-            value={form.nbaBranch}
-            onChange={handleChange}
-            required
-            className="border p-2 rounded"
-          />
-          <input
-            name="specialization"
-            placeholder="Specialization (e.g., Property Law) *"
-            value={form.specialization}
-            onChange={handleChange}
-            required
-            className="border p-2 rounded"
-          />
-          <input
-            name="yearsOfExperience"
-            type="number"
-            placeholder="Years of experience *"
-            value={form.yearsOfExperience}
-            onChange={handleChange}
-            required
-            className="border p-2 rounded"
-          />
-          <input
-            name="location"
-            placeholder="City, State *"
-            value={form.location}
-            onChange={handleChange}
-            required
-            className="border p-2 rounded"
-          />
-          <input
-            name="phone"
-            placeholder="Phone number"
-            value={form.phone}
-            onChange={handleChange}
-            className="border p-2 rounded"
-          />
+
+          <select name="country" value={form.country} onChange={handleChange} required className="border p-2 rounded text-gray-900 bg-white">
+            {COUNTRIES.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
+          </select>
+
+          <select name="barAssociation" value={form.barAssociation} onChange={handleChange} required className="border p-2 rounded text-gray-900 bg-white">
+            <option value="">Select bar association</option>
+            {barOptions.map(bar => <option key={bar} value={bar}>{bar}</option>)}
+          </select>
+
+          <input name="barNumber" placeholder="Bar membership number *" value={form.barNumber} onChange={handleChange} required className="border p-2 rounded text-gray-900 bg-white" />
+          <input name="specialization" placeholder="Specialization (e.g., Property Law) *" value={form.specialization} onChange={handleChange} required className="border p-2 rounded text-gray-900 bg-white" />
+          <input name="yearsOfExperience" type="number" placeholder="Years of experience *" value={form.yearsOfExperience} onChange={handleChange} required className="border p-2 rounded text-gray-900 bg-white" />
+          <input name="location" placeholder="City, State, Country *" value={form.location} onChange={handleChange} required className="border p-2 rounded text-gray-900 bg-white" />
+          <input name="phone" placeholder="Phone number" value={form.phone} onChange={handleChange} className="border p-2 rounded text-gray-900 bg-white" />
         </div>
-        
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:bg-gray-400"
-        >
+        <button type="submit" disabled={loading} className="w-full bg-red-600 text-white py-2 rounded hover:bg-gray-600 disabled:bg-gray-400 transition">
           {loading ? 'Registering...' : 'Register as Practitioner'}
         </button>
       </form>
-      
-      <p className="text-center text-sm text-gray-500 mt-4">
-        Already have an account?{' '}
-        <Link href="/practitioners" className="text-blue-600 underline">
-          Login here
-        </Link>
-      </p>
+      <p className="text-center text-sm text-gray-500 mt-4">Already have an account? <Link href="/practitioners" className="text-red-600 underline">Login here</Link></p>
     </div>
   );
 }
