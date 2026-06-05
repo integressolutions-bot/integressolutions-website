@@ -29,38 +29,51 @@ export function Navbar() {
     router.push("/");
   };
 
+  const closeMobileMenu = () => setMobileMenuOpen(false);
+
   return (
     <header className="container">
       <nav className="nav">
-        <Link href="/" className="flex items-center">
-             <Image src="/logo.png" alt="Integres Solutions" width={240} height={80} priority />
+        <Link href="/" className="flex items-center" onClick={closeMobileMenu}>
+          <Image
+            src="/logo.png"
+            alt="Integres Solutions"
+            width={120}
+            height={40}
+            className="w-auto h-10"
+            priority
+          />
         </Link>
 
         <div className={`nav-links ${mobileMenuOpen ? "open" : ""}`}>
-          <Link href="/psid">PSID</Link>
-          <Link href="/blacklist">Blacklist</Link>
-          <Link href="/practitioners">Practitioners</Link>
+          <Link href="/psid" onClick={closeMobileMenu}>PSID</Link>
+          <Link href="/blacklist" onClick={closeMobileMenu}>Blacklist</Link>
+          <Link href="/practitioners" onClick={closeMobileMenu}>Practitioners</Link>
           {user ? (
             <>
-              <Link href="/report">Report</Link>
-              <Link href="/register-property">Register Property</Link>
+              <Link href="/report" onClick={closeMobileMenu}>Report</Link>
+              <Link href="/register-property" onClick={closeMobileMenu}>Register Property</Link>
+              {user.role === "ADMIN" && (
+                <Link href="/admin" onClick={closeMobileMenu}>Admin</Link>
+              )}
               <button onClick={logout} className="nav-button">
                 Logout
               </button>
             </>
           ) : (
             <>
-              <Link href="/login">Login</Link>
-              <Link href="/register">Register</Link>
+              <Link href="/login" onClick={closeMobileMenu}>Login</Link>
+              <Link href="/register" onClick={closeMobileMenu}>Register</Link>
             </>
           )}
-          <Link href="/about">About</Link>
-          <Link href="/contact">Contact</Link>
+          <Link href="/about" onClick={closeMobileMenu}>About</Link>
+          <Link href="/contact" onClick={closeMobileMenu}>Contact</Link>
         </div>
 
         <button
           className="mobile-menu-button"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          role="button"
           style={{
             display: "none",
             background: "none",
