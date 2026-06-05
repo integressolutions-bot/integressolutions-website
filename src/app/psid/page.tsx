@@ -122,7 +122,7 @@ export default function PsidPage() {
       <h1 style={{ fontSize: '2rem', marginBottom: '1rem' }}>PSID Verification</h1>
       
       <p style={{ marginBottom: '1.5rem', color: '#666', lineHeight: '1.5' }}>
-        Use the Product Serial Identification system to verify an item serial before
+        Use the Property Security Identification system to verify an items serial Number before
         purchase or recovery. For the best scan experience, use the PSID mobile app for QR,
         barcode, and photo-assisted serial capture.
       </p>

@@ -117,7 +117,7 @@ export default function PractitionersPage() {
   const filteredPractitioners = practitioners.filter(p =>
     p.name.toLowerCase().includes(filter.toLowerCase()) ||
     p.specialization.toLowerCase().includes(filter.toLowerCase()) ||
-    p.nbaBranch?.toLowerCase().includes(filter.toLowerCase())
+    p.barAssociation.toLowerCase().includes(filter.toLowerCase())
   );
 
   if (loading) return <div className="p-6 text-center">Loading practitioners...</div>;
@@ -151,7 +151,7 @@ export default function PractitionersPage() {
       {/* Directory Tab */}
       {activeTab === 'directory' && (
         <>
-          <h1 className="text-3xl font-bold mb-2">NBA-Verified Practitioners</h1>
+          <h1 className="text-3xl font-bold mb-2">Verified Practitioners</h1>
           <p className="text-gray-600 mb-6">
             Connect with verified legal practitioners for blacklist disputes, property verification, and mediation.
           </p>
@@ -160,7 +160,7 @@ export default function PractitionersPage() {
           <div className="mb-6">
             <input
               type="text"
-              placeholder="Filter by name, specialization, or NBA branch..."
+              placeholder="Filter by name, specialization, or BAR "
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
               className="w-full p-3 border rounded-lg text-gray-900 bg-white"
@@ -177,7 +177,7 @@ export default function PractitionersPage() {
                     <p className="text-sm text-gray-500">NBA #{practitioner.barNumber} • {practitioner.nbaBranch}</p>
                   </div>
                   {practitioner.verified && (
-                    <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">NBA Verified</span>
+                    <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Verified</span>
                   )}
                 </div>
 
@@ -217,7 +217,7 @@ export default function PractitionersPage() {
               <div className="text-center mb-8">
                 <span className="text-5xl">⚖️</span>
                 <h1 className="text-2xl font-bold mt-2">Practitioner Portal</h1>
-                <p className="text-gray-600">Authorized NBA-verified practitioners only</p>
+                <p className="text-gray-600">Verified practitioners only</p>
               </div>
 
               <form onSubmit={handleLogin} className="bg-white border rounded-lg p-6 shadow-sm">

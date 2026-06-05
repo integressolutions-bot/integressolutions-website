@@ -14,6 +14,7 @@ const COUNTRIES = [
   { code: 'US', name: 'United States', barAssociations: ['American Bar Association (ABA)'] },
   { code: 'GB', name: 'United Kingdom', barAssociations: ['Law Society of England and Wales'] },
   { code: 'IE', name: 'Ireland', barAssociations: ['Law Society of Ireland'] },
+  { code: 'CA', name: 'Canada', barAssociations: ['Canadian Bar Association', 'Law Society of Ontario'] }
 ];
 
 export default function PractitionerRegisterPage() {

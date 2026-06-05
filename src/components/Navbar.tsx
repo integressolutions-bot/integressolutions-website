@@ -38,8 +38,8 @@ export function Navbar() {
           <Image
             src="/logo.png"
             alt="Integres Solutions"
-            width={120}
-            height={40}
+            width={480}
+            height={120}
             className="w-auto h-10"
             priority
           />
