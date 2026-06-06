@@ -18,7 +18,7 @@ interface Practitioner {
   verified: boolean;
   rating: number;
   barNumber: string;
-  nbaBranch: string;
+  barAssociation: string;
   yearsOfExperience: number;
   location: string;
   availability: 'available' | 'busy' | 'unavailable';
@@ -174,7 +174,7 @@ export default function PractitionersPage() {
                 <div className="flex justify-between items-start">
                   <div>
                     <h2 className="text-xl font-bold">{practitioner.name}</h2>
-                    <p className="text-sm text-gray-500">NBA #{practitioner.barNumber} • {practitioner.nbaBranch}</p>
+                    <p className="text-sm text-gray-500"> #{practitioner.barNumber} • {practitioner.barAssociation}</p>
                   </div>
                   {practitioner.verified && (
                     <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Verified</span>
