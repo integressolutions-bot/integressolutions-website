@@ -1,4 +1,4 @@
- 'use client';
+'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -13,6 +13,7 @@ interface Stats {
   totalPractitioners: number;
   pendingPractitioners: number;
   verifiedPractitioners: number;
+  totalUsers: number;
 }
 
 interface PendingReport {
@@ -37,7 +38,7 @@ interface PSIDProperty {
   serial: string;
   itemName: string;
   owner: { fullName: string; email: string };
-  status: 'ACTIVE' | 'STOLEN' | 'RECOVERED';
+  status: string;
   createdAt: string;
 }
 
@@ -46,6 +47,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState<'stats' | 'blacklist' | 'practitioners' | 'psid'>('stats');
+
   const [stats, setStats] = useState<Stats | null>(null);
   const [pendingReports, setPendingReports] = useState<PendingReport[]>([]);
   const [pendingPractitioners, setPendingPractitioners] = useState<PendingPractitioner[]>([]);
@@ -88,7 +90,7 @@ export default function AdminPage() {
     fetchAll();
   }, [router]);
 
-  const handleReportAction = async (id: string, status: 'APPROVED' | 'REJECTED') => {
+  const handleReportAction = async (id: string, status: string) => {
     setProcessing(id);
     try {
       await safePost(`/admin/blacklist/${id}/review`, { status }, true);
@@ -147,75 +149,70 @@ export default function AdminPage() {
       setSearchResults([]);
       return;
     }
-    setLoading(true);
     try {
       const results = await safeGet<PSIDProperty[]>(`/admin/psid/search?q=${encodeURIComponent(searchQuery)}`, true);
       setSearchResults(results);
     } catch (err: any) {
       alert(err.message);
-    } finally {
-      setLoading(false);
     }
   };
 
-  if (loading && !stats) return <div className="p-6 text-center">Loading admin dashboard...</div>;
+  if (loading) return <div className="p-6 text-center text-gray-900">Loading admin dashboard...</div>;
   if (error) return <div className="p-6 text-center text-red-600">{error}</div>;
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
+      <h1 className="text-3xl font-bold mb-6 text-gray-900">Admin Dashboard</h1>
 
-      {/* Tabs */}
       <div className="flex flex-wrap gap-2 border-b mb-6">
-        <button onClick={() => setActiveTab('stats')} className={`px-4 py-2 ${activeTab === 'stats' ? 'border-b-2 border-red-600 font-semibold' : ''}`}>📊 Stats</button>
-        <button onClick={() => setActiveTab('blacklist')} className={`px-4 py-2 ${activeTab === 'blacklist' ? 'border-b-2 border-red-600 font-semibold' : ''}`}>📝 Blacklist ({pendingReports.length})</button>
-        <button onClick={() => setActiveTab('practitioners')} className={`px-4 py-2 ${activeTab === 'practitioners' ? 'border-b-2 border-red-600 font-semibold' : ''}`}>👥 Practitioners ({pendingPractitioners.length})</button>
-        <button onClick={() => setActiveTab('psid')} className={`px-4 py-2 ${activeTab === 'psid' ? 'border-b-2 border-red-600 font-semibold' : ''}`}>🏠 PSID Management</button>
+        <button onClick={() => setActiveTab('stats')} className={`px-4 py-2 ${activeTab === 'stats' ? 'border-b-2 border-red-600 font-semibold text-red-600' : 'text-gray-700'}`}>📊 Stats</button>
+        <button onClick={() => setActiveTab('blacklist')} className={`px-4 py-2 ${activeTab === 'blacklist' ? 'border-b-2 border-red-600 font-semibold text-red-600' : 'text-gray-700'}`}>📝 Blacklist ({pendingReports.length})</button>
+        <button onClick={() => setActiveTab('practitioners')} className={`px-4 py-2 ${activeTab === 'practitioners' ? 'border-b-2 border-red-600 font-semibold text-red-600' : 'text-gray-700'}`}>👥 Practitioners ({pendingPractitioners.length})</button>
+        <button onClick={() => setActiveTab('psid')} className={`px-4 py-2 ${activeTab === 'psid' ? 'border-b-2 border-red-600 font-semibold text-red-600' : 'text-gray-700'}`}>🏠 PSID Management</button>
       </div>
 
-      {/* Stats Tab */}
       {activeTab === 'stats' && stats && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div className="bg-blue-50 p-4 rounded-lg"><div className="text-2xl font-bold">{stats.totalProperties}</div><div>Registered Properties</div></div>
-          <div className="bg-yellow-50 p-4 rounded-lg"><div className="text-2xl font-bold">{stats.totalBlacklistReports}</div><div>Total Blacklist Reports</div></div>
-          <div className="bg-orange-50 p-4 rounded-lg"><div className="text-2xl font-bold">{stats.pendingReports}</div><div>Pending Reports</div></div>
-          <div className="bg-purple-50 p-4 rounded-lg"><div className="text-2xl font-bold">{stats.approvedReports}</div><div>Approved Reports</div></div>
-          <div className="bg-red-50 p-4 rounded-lg"><div className="text-2xl font-bold">{stats.rejectedReports}</div><div>Rejected Reports</div></div>
-          <div className="bg-indigo-50 p-4 rounded-lg"><div className="text-2xl font-bold">{stats.totalPractitioners}</div><div>Total Practitioners</div></div>
-          <div className="bg-pink-50 p-4 rounded-lg"><div className="text-2xl font-bold">{stats.pendingPractitioners}</div><div>Pending Verifications</div></div>
-          <div className="bg-teal-50 p-4 rounded-lg"><div className="text-2xl font-bold">{stats.verifiedPractitioners}</div><div>Verified Practitioners</div></div>
+          <div className="bg-white border-l-4 border-red-600 p-4 rounded shadow"><div className="text-2xl font-bold text-gray-900">{stats.totalProperties}</div><div className="text-gray-600">Registered Properties</div></div>
+          <div className="bg-white border-l-4 border-yellow-500 p-4 rounded shadow"><div className="text-2xl font-bold text-gray-900">{stats.totalBlacklistReports}</div><div className="text-gray-600">Total Blacklist Reports</div></div>
+          <div className="bg-white border-l-4 border-orange-500 p-4 rounded shadow"><div className="text-2xl font-bold text-gray-900">{stats.pendingReports}</div><div className="text-gray-600">Pending Reports</div></div>
+          <div className="bg-white border-l-4 border-green-500 p-4 rounded shadow"><div className="text-2xl font-bold text-gray-900">{stats.approvedReports}</div><div className="text-gray-600">Approved Reports</div></div>
+          <div className="bg-white border-l-4 border-red-500 p-4 rounded shadow"><div className="text-2xl font-bold text-gray-900">{stats.rejectedReports}</div><div className="text-gray-600">Rejected Reports</div></div>
+          <div className="bg-white border-l-4 border-indigo-500 p-4 rounded shadow"><div className="text-2xl font-bold text-gray-900">{stats.totalPractitioners}</div><div className="text-gray-600">Total Practitioners</div></div>
+          <div className="bg-white border-l-4 border-pink-500 p-4 rounded shadow"><div className="text-2xl font-bold text-gray-900">{stats.pendingPractitioners}</div><div className="text-gray-600">Pending Verifications</div></div>
+          <div className="bg-white border-l-4 border-teal-500 p-4 rounded shadow"><div className="text-2xl font-bold text-gray-900">{stats.verifiedPractitioners}</div><div className="text-gray-600">Verified Practitioners</div></div>
+          <div className="bg-white border-l-4 border-purple-500 p-4 rounded shadow"><div className="text-2xl font-bold text-gray-900">{stats.totalUsers}</div><div className="text-gray-600">Registered Users</div></div>
+          <div className="bg-white border-l-4 border-blue-500 p-4 rounded shadow"><div className="text-2xl font-bold text-gray-900">—</div><div className="text-gray-600">Visitors (last 30 days)</div></div>
         </div>
       )}
 
-      {/* Blacklist Tab */}
       {activeTab === 'blacklist' && (
         <div className="space-y-4">
-          {pendingReports.length === 0 ? <p>No pending reports.</p> : pendingReports.map(report => (
-            <div key={report._id} className="border rounded-lg p-4">
-              <p><strong>Subject:</strong> {report.subjectName}</p>
-              <p><strong>Category:</strong> {report.category}</p>
-              <p><strong>Summary:</strong> {report.summary}</p>
-              <p><strong>Reported by:</strong> {report.reporter.user?.fullName || 'Anonymous'} ({report.reporter.user?.email})</p>
-              <p><strong>Date:</strong> {new Date(report.createdAt).toLocaleString()}</p>
+          {pendingReports.length === 0 ? <p className="text-gray-600">No pending reports.</p> : pendingReports.map(report => (
+            <div key={report._id} className="border rounded-lg p-4 bg-white shadow">
+              <p className="font-semibold text-gray-900">{report.subjectName}</p>
+              <p className="text-sm text-gray-600">Category: {report.category}</p>
+              <p className="text-sm text-gray-700 mt-1">{report.summary}</p>
+              <p className="text-xs text-gray-500">Reported by: {report.reporter.user?.fullName || 'Anonymous'} ({report.reporter.user?.email})</p>
+              <p className="text-xs text-gray-500">Date: {new Date(report.createdAt).toLocaleString()}</p>
               <div className="mt-3 flex gap-2">
-                <button onClick={() => handleReportAction(report._id, 'APPROVED')} disabled={processing === report._id} className="bg-green-600 text-white px-3 py-1 rounded">Approve</button>
-                <button onClick={() => handleReportAction(report._id, 'REJECTED')} disabled={processing === report._id} className="bg-red-600 text-white px-3 py-1 rounded">Reject</button>
+                <button onClick={() => handleReportAction(report._id, 'APPROVED')} disabled={processing === report._id} className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">Approve</button>
+                <button onClick={() => handleReportAction(report._id, 'REJECTED')} disabled={processing === report._id} className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">Reject</button>
               </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* Practitioners Tab */}
       {activeTab === 'practitioners' && (
         <div className="space-y-4">
-          {pendingPractitioners.length === 0 ? <p>No pending practitioners.</p> : pendingPractitioners.map(p => (
-            <div key={p._id} className="border rounded-lg p-4">
-              <p><strong>Name:</strong> {p.user.fullName}</p>
-              <p><strong>Email:</strong> {p.user.email}</p>
-              <p><strong>Bar Association:</strong> {p.barAssociation}</p>
-              <p><strong>Practice Areas:</strong> {p.practiceAreas.join(', ')}</p>
-              <p><strong>Registered:</strong> {new Date(p.createdAt).toLocaleString()}</p>
+          {pendingPractitioners.length === 0 ? <p className="text-gray-600">No pending practitioners.</p> : pendingPractitioners.map(p => (
+            <div key={p._id} className="border rounded-lg p-4 bg-white shadow">
+              <p className="font-semibold text-gray-900">{p.user.fullName}</p>
+              <p className="text-sm text-gray-600">Email: {p.user.email}</p>
+              <p className="text-sm text-gray-700">Bar: {p.barAssociation}</p>
+              <p className="text-sm text-gray-700">Areas: {p.practiceAreas.join(', ')}</p>
+              <p className="text-xs text-gray-500">Registered: {new Date(p.createdAt).toLocaleString()}</p>
               <div className="mt-3 flex gap-2">
                 <button onClick={() => handlePractitionerAction(p._id, 'approve')} disabled={processing === p._id} className="bg-green-600 text-white px-3 py-1 rounded">Verify</button>
                 <button onClick={() => handlePractitionerAction(p._id, 'reject')} disabled={processing === p._id} className="bg-red-600 text-white px-3 py-1 rounded">Reject</button>
@@ -225,52 +222,50 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* PSID Management Tab */}
       {activeTab === 'psid' && (
         <div className="space-y-6">
           <div className="flex gap-2">
-            <input type="text" placeholder="Search by serial or item name" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="flex-1 border p-2 rounded" />
-            <button onClick={handleSearch} className="bg-blue-600 text-white px-4 py-2 rounded">Search</button>
+            <input type="text" placeholder="Search by serial or item name" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="flex-1 border p-2 rounded text-gray-900 bg-white" />
+            <button onClick={handleSearch} className="bg-red-600 text-white px-4 py-2 rounded hover:bg-gray-600">Search</button>
           </div>
+
           {searchResults.length > 0 && (
             <div>
-              <h2 className="text-xl font-semibold mb-2">Search Results</h2>
-              <div className="space-y-2">
-                {searchResults.map(prop => (
-                  <div key={prop._id} className="border p-3 rounded flex justify-between items-center">
-                    <div><span className="font-mono">{prop.serial}</span> – {prop.itemName} – {prop.status}</div>
-                    <button onClick={() => router.push(`/admin/properties/${prop.serial}`)} className="text-blue-600">View Details</button>
-                  </div>
-                ))}
-              </div>
+              <h2 className="text-xl font-semibold mb-2 text-gray-900">Search Results</h2>
+              {searchResults.map(prop => (
+                <div key={prop._id} className="border p-3 rounded mb-2 flex justify-between items-center bg-white">
+                  <div className="text-gray-900"><span className="font-mono">{prop.serial}</span> – {prop.itemName} – {prop.status}</div>
+                  <button onClick={() => router.push(`/admin/properties/${prop.serial}`)} className="text-blue-600">View Details</button>
+                </div>
+              ))}
             </div>
           )}
+
           <div>
-            <h2 className="text-xl font-semibold mb-2">Stolen Items</h2>
-            {stolenProperties.length === 0 ? <p>No stolen items reported.</p> : (
-              <div className="space-y-2">
-                {stolenProperties.map(prop => (
-                  <div key={prop._id} className="border p-3 rounded flex justify-between items-center">
-                    <div><span className="font-mono">{prop.serial}</span> – {prop.itemName} – Owner: {prop.owner.fullName}</div>
-                    <button onClick={() => handleRecover(prop.serial)} disabled={processing === prop.serial} className="bg-green-600 text-white px-3 py-1 rounded">Mark Recovered</button>
-                  </div>
-                ))}
+            <h2 className="text-xl font-semibold mb-2 text-gray-900">Stolen Items</h2>
+            {stolenProperties.length === 0 ? <p className="text-gray-600">No stolen items reported.</p> : stolenProperties.map(prop => (
+              <div key={prop._id} className="border p-3 rounded mb-2 flex justify-between items-center bg-white">
+                <div className="text-gray-900"><span className="font-mono">{prop.serial}</span> – {prop.itemName} – Owner: {prop.owner.fullName}</div>
+                <button onClick={() => handleRecover(prop.serial)} disabled={processing === prop.serial} className="bg-green-600 text-white px-3 py-1 rounded">Mark Recovered</button>
               </div>
-            )}
+            ))}
           </div>
+
           <div>
-            <h2 className="text-xl font-semibold mb-2">All Properties</h2>
+            <h2 className="text-xl font-semibold mb-2 text-gray-900">All Properties</h2>
             <div className="overflow-x-auto">
               <table className="min-w-full bg-white border">
-                <thead><tr className="bg-gray-100 border-b"><th className="p-2 text-left">Serial</th><th className="p-2 text-left">Item Name</th><th className="p-2 text-left">Owner</th><th className="p-2 text-left">Status</th><th className="p-2 text-left">Registered</th></tr></thead>
+                <thead className="bg-gray-100">
+                  <tr><th className="p-2 text-left text-gray-900">PSID</th><th className="p-2 text-left text-gray-900">Item Name</th><th className="p-2 text-left text-gray-900">Owner</th><th className="p-2 text-left text-gray-900">Status</th><th className="p-2 text-left text-gray-900">Registered</th></tr>
+                </thead>
                 <tbody>
                   {properties.map(prop => (
-                    <tr key={prop._id} className="border-b">
-                      <td className="p-2 font-mono">{prop.serial}</td>
-                      <td className="p-2">{prop.itemName}</td>
-                      <td className="p-2">{prop.owner.fullName} ({prop.owner.email})</td>
-                      <td className="p-2 capitalize">{prop.status}</td>
-                      <td className="p-2">{new Date(prop.createdAt).toLocaleDateString()}</td>
+                    <tr key={prop._id} className="border-t">
+                      <td className="p-2 font-mono text-gray-900">{prop.serial}</td>
+                      <td className="p-2 text-gray-900">{prop.itemName}</td>
+                      <td className="p-2 text-gray-900">{prop.owner.fullName} (<span className="text-xs">{prop.owner.email}</span>)</td>
+                      <td className="p-2 capitalize text-gray-900">{prop.status}</td>
+                      <td className="p-2 text-gray-900">{new Date(prop.createdAt).toLocaleDateString()}</td>
                     </tr>
                   ))}
                 </tbody>
