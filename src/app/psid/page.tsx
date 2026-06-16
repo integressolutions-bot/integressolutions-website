@@ -147,7 +147,7 @@ export default function PsidPage() {
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow">
-      <h1 className="text-3xl font-bold mb-2 text-gray-900">🔐 PSID – Property Secure Identification</h1>
+      <h1 className="text-3xl font-bold mb-2 text-gray-900">🔐 PSID – Property Security Identification</h1>
       <p className="text-gray-700 mb-6">
         PSID is a unique identifier that helps protect your property, verify ownership, and assist in recovery.
         Register your valuable items – from electronics and vehicles to real estate and jewelry – and generate a secure PSID
