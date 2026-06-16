@@ -23,14 +23,12 @@ const CATEGORIES = [
 ];
 
 export default function BlacklistPage() {
-  // ---------- Search state ----------
   const [query, setQuery] = useState("");
   const [result, setResult] = useState<BlacklistResult | null>(null);
   const [searchError, setSearchError] = useState("");
   const [searching, setSearching] = useState(false);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
-  // ---------- Report form state ----------
   const [showReportForm, setShowReportForm] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [subjectName, setSubjectName] = useState("");
@@ -42,7 +40,6 @@ export default function BlacklistPage() {
   const [reportSuccess, setReportSuccess] = useState(false);
   const [reportError, setReportError] = useState("");
 
-  // Load recent searches
   useEffect(() => {
     const saved = localStorage.getItem("blacklist_searches");
     if (saved) {
@@ -58,7 +55,6 @@ export default function BlacklistPage() {
     localStorage.setItem("blacklist_searches", JSON.stringify(updated));
   };
 
-  // Search handler
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim()) return;
@@ -81,7 +77,6 @@ export default function BlacklistPage() {
     setTimeout(() => handleSearch({ preventDefault: () => {} } as React.FormEvent), 100);
   };
 
-  // Report submission handler
   const handleSubmitReport = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedCategory) {
@@ -111,7 +106,6 @@ export default function BlacklistPage() {
     try {
       await safeUpload("/blacklist/submit-due-diligence", formData, true);
       setReportSuccess(true);
-      // Reset form
       setSelectedCategory("");
       setSubjectName("");
       setSubjectEmail("");
@@ -129,12 +123,11 @@ export default function BlacklistPage() {
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow">
       <h1 className="text-3xl font-bold mb-2 text-gray-900">Integres Blacklist</h1>
-      <p className="text-gray-600 mb-6">
+      <p className="text-gray-700 mb-6">
         The Integres Blacklist is a public record of individuals and companies that have been reported for misconduct, fraud, or breach of trust.
         Reports are reviewed by our team before publication to ensure fairness and accuracy.
       </p>
 
-      {/* Two action buttons */}
       <div className="flex flex-wrap gap-4 mb-8">
         <button
           onClick={() => setShowReportForm(false)}
@@ -150,26 +143,47 @@ export default function BlacklistPage() {
         </button>
       </div>
 
-      {/* ========== HOW IT WORKS SECTION ========== */}
-      <div className="bg-gray-50 p-4 rounded-lg mb-6 border">
+      {/* ✅ HOW IT WORKS SECTION – all text now has explicit colors */}
+      <div className="bg-gray-50 p-4 rounded-lg mb-6 border border-gray-200">
         <h2 className="text-xl font-bold text-gray-900 mb-2">📋 How It Works</h2>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
-          <div><span className="font-bold text-red-600">1. Submit</span><br/>Submit a report with evidence (no payment required).</div>
-          <div><span className="font-bold text-yellow-600">2. Review</span><br/>Our team reviews the report for validity and completeness.</div>
-          <div><span className="font-bold text-blue-600">3. Pay</span><br/>If approved, you'll be asked to pay a fee to publish the report.</div>
-          <div><span className="font-bold text-green-600">4. Publish</span><br/>The report becomes public. The subject is notified and can dispute.</div>
+          <div className="bg-white p-3 rounded border border-gray-200">
+            <span className="font-bold text-red-600 block">1. Submit</span>
+            <span className="text-gray-700">Submit a report with evidence (no payment required).</span>
+          </div>
+          <div className="bg-white p-3 rounded border border-gray-200">
+            <span className="font-bold text-yellow-600 block">2. Review</span>
+            <span className="text-gray-700">Our team reviews the report for validity and completeness.</span>
+          </div>
+          <div className="bg-white p-3 rounded border border-gray-200">
+            <span className="font-bold text-blue-600 block">3. Pay</span>
+            <span className="text-gray-700">If approved, you'll be asked to pay a fee to publish the report.</span>
+          </div>
+          <div className="bg-white p-3 rounded border border-gray-200">
+            <span className="font-bold text-green-600 block">4. Publish</span>
+            <span className="text-gray-700">The report becomes public. The subject is notified and can dispute.</span>
+          </div>
         </div>
       </div>
 
-      {/* ========== FREE SEARCH SECTION ========== */}
+      {/* ✅ PRICING SECTION – now visible */}
+      <div className="bg-gray-100 p-4 rounded-lg flex gap-4 mb-6 flex-wrap border border-gray-200">
+        <div className="bg-white p-3 rounded border border-gray-200 flex-1 min-w-[150px]">
+          <span className="font-medium text-gray-900 block">Check / Search</span>
+          <span className="text-green-600 font-bold text-lg">Free</span>
+        </div>
+        <div className="bg-white p-3 rounded border border-gray-200 flex-1 min-w-[150px]">
+          <span className="font-medium text-gray-900 block">Report – Individuals</span>
+          <span className="text-gray-900 font-bold text-lg">From ₦15,000</span>
+        </div>
+        <div className="bg-white p-3 rounded border border-gray-200 flex-1 min-w-[150px]">
+          <span className="font-medium text-gray-900 block">Report – Companies</span>
+          <span className="text-gray-900 font-bold text-lg">From ₦30,000</span>
+        </div>
+      </div>
+
       {!showReportForm && (
         <>
-          <div className="bg-gray-100 p-4 rounded-lg flex gap-4 mb-6 flex-wrap">
-            <div><span className="font-medium">Check / Search</span><br/><span className="text-green-600 font-bold">Free</span></div>
-            <div><span className="font-medium">Report - Individuals</span><br/><span className="font-bold">From ₦15,000</span></div>
-            <div><span className="font-medium">Report - Companies</span><br/><span className="font-bold">From ₦30,000</span></div>
-          </div>
-
           <form onSubmit={handleSearch} className="mb-6">
             <div className="flex gap-2">
               <input
@@ -194,10 +208,10 @@ export default function BlacklistPage() {
 
           {recentSearches.length > 0 && !result && !searching && (
             <div className="mb-4">
-              <p className="text-sm text-gray-500">Recent searches:</p>
+              <p className="text-sm text-gray-600">Recent searches:</p>
               <div className="flex gap-2 flex-wrap">
                 {recentSearches.map(term => (
-                  <button key={term} onClick={() => handleQuickSearch(term)} className="bg-gray-200 px-2 py-1 rounded text-sm">
+                  <button key={term} onClick={() => handleQuickSearch(term)} className="bg-gray-200 px-2 py-1 rounded text-sm text-gray-800">
                     {term}
                   </button>
                 ))}
@@ -207,30 +221,29 @@ export default function BlacklistPage() {
 
           {result && (
             <div className={`p-4 rounded-lg ${result.found ? 'bg-yellow-50 border border-yellow-200' : 'bg-green-50 border border-green-200'}`}>
-              <h2 className="font-bold text-lg">{result.found ? '⚠️ Record Found' : '✅ Clean Record'}</h2>
+              <h2 className="font-bold text-lg text-gray-900">{result.found ? '⚠️ Record Found' : '✅ Clean Record'}</h2>
               {result.found && result.records ? (
                 result.records.map((record, idx) => (
-                  <div key={idx} className="mt-3 pt-3 border-t">
-                    <p><strong>Name:</strong> {record.name}</p>
-                    <p><strong>Category:</strong> {record.type}</p>
-                    <p><strong>Reason:</strong> {record.reason}</p>
-                    <p><strong>Reported:</strong> {new Date(record.dateReported).toLocaleDateString()}</p>
-                    <p><strong>Status:</strong> <span className="capitalize">{record.status}</span></p>
+                  <div key={idx} className="mt-3 pt-3 border-t border-gray-200">
+                    <p className="text-gray-900"><strong>Name:</strong> {record.name}</p>
+                    <p className="text-gray-700"><strong>Category:</strong> {record.type}</p>
+                    <p className="text-gray-700"><strong>Reason:</strong> {record.reason}</p>
+                    <p className="text-gray-600"><strong>Reported:</strong> {new Date(record.dateReported).toLocaleDateString()}</p>
+                    <p className="text-gray-700"><strong>Status:</strong> <span className="capitalize">{record.status}</span></p>
                   </div>
                 ))
               ) : (
-                <p>No blacklist records found for "{query}".</p>
+                <p className="text-gray-700">No blacklist records found for "{query}".</p>
               )}
             </div>
           )}
         </>
       )}
 
-      {/* ========== REPORT FORM SECTION ========== */}
       {showReportForm && (
         <div className="border rounded-lg p-6 bg-white shadow">
           <h2 className="text-2xl font-bold mb-2 text-gray-900">Submit a Blacklist Report</h2>
-          <p className="text-gray-600 mb-4">
+          <p className="text-gray-700 mb-4">
             Reports are submitted for review at no cost. If approved, you will be guided through payment before publication.
           </p>
 
@@ -243,7 +256,6 @@ export default function BlacklistPage() {
           {reportError && <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{reportError}</div>}
 
           <form onSubmit={handleSubmitReport} className="space-y-4">
-            {/* Category selection */}
             <div>
               <label className="block font-semibold mb-2 text-gray-900">Category *</label>
               <div className="flex flex-wrap gap-2">
@@ -263,7 +275,7 @@ export default function BlacklistPage() {
                 ))}
               </div>
               {selectedCategory && (
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-600 mt-1">
                   {CATEGORIES.find(c => c.value === selectedCategory)?.description}
                 </p>
               )}
