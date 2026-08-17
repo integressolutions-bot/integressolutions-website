@@ -6,9 +6,11 @@ import { safePost, safeUpload } from "@/lib/api";
 interface BlacklistResult {
   found: boolean;
   records?: Array<{
-    name: string;
-    type: string;
-    reason: string;
+    name?: string;
+    maskedName?: string;
+    type?: string;
+    category?: string;
+    reason?: string;
     dateReported: string;
     status: string;
   }>;
@@ -104,7 +106,7 @@ export default function BlacklistPage() {
     if (evidenceFile) formData.append("files", evidenceFile);
 
     try {
-      await safeUpload("/blacklist/submit-due-diligence", formData, true);
+      await safeUpload("/blacklist/submit", formData, true);
       setReportSuccess(true);
       setSelectedCategory("");
       setSubjectName("");
@@ -124,8 +126,7 @@ export default function BlacklistPage() {
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow">
       <h1 className="text-3xl font-bold mb-2 text-gray-900">Integres Blacklist</h1>
       <p className="text-gray-700 mb-6">
-        The Integres Blacklist is a public record of individuals and companies that have been reported for misconduct, fraud, or breach of trust.
-        Reports are reviewed by our team before publication to ensure fairness and accuracy.
+        Check the Integres Blacklist for publication-eligible records, submit documented reports, and use the response and dispute process when a record concerns you. Reports are reviewed before public eligibility; a match is not by itself a court finding or declaration of criminal guilt.
       </p>
 
       <div className="flex flex-wrap gap-4 mb-8">
@@ -145,23 +146,23 @@ export default function BlacklistPage() {
 
       {/* ✅ HOW IT WORKS SECTION – all text now has explicit colors */}
       <div className="bg-gray-50 p-4 rounded-lg mb-6 border border-gray-200">
-        <h2 className="text-xl font-bold text-gray-900 mb-2">📋 How It Works</h2>
+        <h2 className="text-xl font-bold text-gray-900 mb-2">How Blacklist Works</h2>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
           <div className="bg-white p-3 rounded border border-gray-200">
             <span className="font-bold text-red-600 block">1. Submit</span>
-            <span className="text-gray-700">Submit a report with evidence (no payment required).</span>
+            <span className="text-gray-700">Submit a good-faith report with facts and supporting evidence.</span>
           </div>
           <div className="bg-white p-3 rounded border border-gray-200">
             <span className="font-bold text-yellow-600 block">2. Review</span>
-            <span className="text-gray-700">Our team reviews the report for validity and completeness.</span>
+            <span className="text-gray-700">Integres reviews completeness, evidence and policy eligibility; reports are not automatically published.</span>
           </div>
           <div className="bg-white p-3 rounded border border-gray-200">
-            <span className="font-bold text-blue-600 block">3. Pay</span>
-            <span className="text-gray-700">If approved, you'll be asked to pay a fee to publish the report.</span>
+            <span className="font-bold text-blue-600 block">3. Notice & Respond</span>
+            <span className="text-gray-700">Where required, the affected subject is notified and can respond, dispute identity, add context or seek correction.</span>
           </div>
           <div className="bg-white p-3 rounded border border-gray-200">
-            <span className="font-bold text-green-600 block">4. Publish</span>
-            <span className="text-gray-700">The report becomes public. The subject is notified and can dispute.</span>
+            <span className="font-bold text-green-600 block">4. Decision</span>
+            <span className="text-gray-700">A report may be approved, rejected, held for more information or made publication-eligible. Disputes and corrections can reopen review.</span>
           </div>
         </div>
       </div>
@@ -221,13 +222,13 @@ export default function BlacklistPage() {
 
           {result && (
             <div className={`p-4 rounded-lg ${result.found ? 'bg-yellow-50 border border-yellow-200' : 'bg-green-50 border border-green-200'}`}>
-              <h2 className="font-bold text-lg text-gray-900">{result.found ? '⚠️ Record Found' : '✅ Clean Record'}</h2>
+              <h2 className="font-bold text-lg text-gray-900">{result.found ? '⚠️ Blacklist Record Found' : 'No Matching Public Record'}</h2>
               {result.found && result.records ? (
                 result.records.map((record, idx) => (
                   <div key={idx} className="mt-3 pt-3 border-t border-gray-200">
-                    <p className="text-gray-900"><strong>Name:</strong> {record.name}</p>
-                    <p className="text-gray-700"><strong>Category:</strong> {record.type}</p>
-                    <p className="text-gray-700"><strong>Reason:</strong> {record.reason}</p>
+                    <p className="text-gray-900"><strong>Subject:</strong> {record.maskedName || record.name || "Masked subject"}</p>
+                    <p className="text-gray-700"><strong>Category:</strong> {record.category || record.type || "Reviewed record"}</p>
+                    {record.reason ? <p className="text-gray-700"><strong>Public summary:</strong> {record.reason}</p> : null}
                     <p className="text-gray-600"><strong>Reported:</strong> {new Date(record.dateReported).toLocaleDateString()}</p>
                     <p className="text-gray-700"><strong>Status:</strong> <span className="capitalize">{record.status}</span></p>
                   </div>
@@ -244,7 +245,7 @@ export default function BlacklistPage() {
         <div className="border rounded-lg p-6 bg-white shadow">
           <h2 className="text-2xl font-bold mb-2 text-gray-900">Submit a Blacklist Report</h2>
           <p className="text-gray-700 mb-4">
-            Reports are submitted for review at no cost. If approved, you will be guided through payment before publication.
+            Reports are confidential when submitted and remain pending due diligence. Any administrative fee is separate from the moderation decision and does not guarantee publication.
           </p>
 
           {reportSuccess && (
@@ -300,7 +301,7 @@ export default function BlacklistPage() {
                 value={subjectEmail}
                 onChange={(e) => setSubjectEmail(e.target.value)}
                 className="w-full border p-2 rounded text-gray-900 bg-white"
-                placeholder="If provided, they will be notified when the report is published"
+                placeholder="If provided, it may be used for subject notice and response"
               />
             </div>
 

@@ -8,7 +8,7 @@ export default function HomePage() {
         <h1>Secure identification, accountability, and dispute resolution for modern communities.</h1>
         <p>
           Integres Solutions Limited provides practical digital services including PSID asset verification,
-          blacklist checking and reporting, and a routed mediation ecosystem for case resolution.
+          Blacklist checking and reporting, subject response and dispute handling, and a routed mediation ecosystem for case resolution.
         </p>
         <div className="button-row">
           <Link className="button" href="/blacklist">Run Free Blacklist Check</Link>
@@ -25,7 +25,7 @@ export default function HomePage() {
           </div>
           <div className="card">
             <h3>Integres Blacklist</h3>
-            <p>Check records for free. Submit paid reports and paid removal requests under a moderated workflow.</p>
+            <p>Check the Blacklist for free. Submit documented reports, track review status, respond to records, dispute inaccuracies, and pursue correction or resolution under a moderated workflow.</p>
           </div>
           <div className="card">
             <h3>Mediation Routing</h3>
@@ -40,7 +40,7 @@ export default function HomePage() {
           <div className="price-item"><span>Blacklist check</span><strong>Free</strong></div>
           <div className="price-item"><span>Blacklist report (individual cases)</span><strong>From ₦15,000</strong></div>
           <div className="price-item"><span>Blacklist report (company cases)</span><strong>From ₦30,000</strong></div>
-          <div className="price-item"><span>Blacklist removal</span><strong>Paid after resolution</strong></div>
+          <div className="price-item"><span>Blacklist resolution/removal review</span><strong>Administrative fee may apply after resolution</strong></div>
           <div className="price-item"><span>Reports and removals</span><strong>Handled in the mobile app</strong></div>
         </div>
       </section>
