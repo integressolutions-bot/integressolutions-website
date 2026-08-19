@@ -83,3 +83,29 @@ export async function safeUpload<T>(path: string, formData: FormData, requireAut
 
   return (parsed?.data ?? parsed) as T;
 }
+
+export async function safePatch<T>(path: string, body: unknown, requireAuth = false): Promise<T> {
+  const headers: HeadersInit = { 'Content-Type': 'application/json' };
+  if (requireAuth) Object.assign(headers, getAuthHeaders());
+
+  const res = await fetch(`${API_BASE}${path}`, {
+    method: 'PATCH',
+    headers,
+    body: JSON.stringify(body),
+    cache: 'no-store',
+  });
+
+  const text = await res.text();
+  let parsed = null;
+  try {
+    parsed = text ? JSON.parse(text) : null;
+  } catch {
+    throw new Error(text || 'Invalid response');
+  }
+
+  if (!res.ok || (parsed && parsed.success === false)) {
+    throw new Error(parsed?.message || 'Request failed');
+  }
+
+  return (parsed?.data ?? parsed) as T;
+}
